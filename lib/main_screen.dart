@@ -5,6 +5,7 @@ import 'package:munchkin/color.dart';
 import 'package:munchkin/components/player_item.dart';
 import 'package:munchkin/munchkin_model.dart';
 import 'package:munchkin/players_store.dart';
+import 'package:munchkin/rule_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -32,14 +33,29 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         backgroundColor: darkGreen,
         foregroundColor: parchment,
-        title: const Text(
-          'Munchkin',
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
+        title: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => RuleScreen(),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(4),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              'Munchkin',
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+            ),
           ),
         ),
+
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

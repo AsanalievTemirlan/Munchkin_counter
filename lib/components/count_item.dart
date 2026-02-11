@@ -23,10 +23,10 @@ class CountItem extends StatelessWidget {
           width: 36,
           height: 36,
           child: IconButton(
-            icon: const Icon(Icons.keyboard_arrow_up),
-            color: bronze,
+            icon: const Icon(Icons.keyboard_arrow_down),
+            color: count > 0 ? bronze : Colors.grey.shade400,
             padding: EdgeInsets.zero,
-            onPressed: onIncrement,
+            onPressed: count > 0 ? onDecrement : null,
           ),
         ),
         Column(
@@ -53,12 +53,13 @@ class CountItem extends StatelessWidget {
           width: 36,
           height: 36,
           child: IconButton(
-            icon: const Icon(Icons.keyboard_arrow_down),
-            color: count > 0 ? bronze : Colors.grey.shade400,
+            icon: const Icon(Icons.keyboard_arrow_up),
+            color: bronze,
             padding: EdgeInsets.zero,
-            onPressed: count > 0 ? onDecrement : null,
+            onPressed: onIncrement,
           ),
         ),
+
       ],
     );
   }
