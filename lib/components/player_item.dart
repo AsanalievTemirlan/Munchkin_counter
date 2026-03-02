@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:munchkin/color.dart';
 import 'package:munchkin/components/count_item.dart';
-import 'package:munchkin/components/spa.dart';
 import 'package:munchkin/munchkin_model.dart';
 
 class PlayerItem extends StatelessWidget {
@@ -11,7 +9,8 @@ class PlayerItem extends StatelessWidget {
   final VoidCallback onDecrementLevel;
   final VoidCallback onIncrementMight;
   final VoidCallback onDecrementMight;
-
+  final int index;
+  final void Function(int index, String name)? onLongPress;
   const PlayerItem({
     super.key,
     required this.model,
@@ -19,11 +18,18 @@ class PlayerItem extends StatelessWidget {
     required this.onDecrementLevel,
     required this.onIncrementMight,
     required this.onDecrementMight,
+    this.onLongPress, required this.index,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onLongPress: (){
+        if (onLongPress != null) {
+          onLongPress!(index, model.name);
+        }
+      },
+        child: Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -98,6 +104,6 @@ class PlayerItem extends StatelessWidget {
           ),
         ],
       ),
-    );
+        ));
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:munchkin/munchkin_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,9 +28,19 @@ class PlayersStore {
 
   Future<void> resetStats() async {
     for (final p in players) {
-      p.level = 0;
+      p.level = 1;
       p.might = 0;
     }
+    await save();
+  }
+
+  Future<void> rename(int index, String newName) async{
+    players[index].name = newName;
+    await save();
+  }
+
+  Future<void> remove(int index) async {
+    players.removeAt(index);
     await save();
   }
 

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:munchkin/color.dart';
 import 'package:munchkin/components/player_item.dart';
@@ -17,10 +15,12 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final store = PlayersStore();
   bool loading = true;
+  final List<int> _availableDragons = [];
 
   @override
   void initState() {
     super.initState();
+    _resetDragonPool();
     store.load().then((_) {
       setState(() => loading = false);
     });
@@ -89,12 +89,36 @@ class _MainScreenState extends State<MainScreen> {
         itemCount: store.players.length,
         itemBuilder: (context, index) {
           final player = store.players[index];
-          return PlayerItem(
+          return Dismissible(
+              key: ValueKey(index),
+              direction: DismissDirection.endToStart,
+              background: Container(
+                alignment: Alignment.centerRight,
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.delete,
+                  color: Colors.white,
+                  size: 30,
+                ),
+              ),
+              onDismissed: (direction) async {
+                await store.remove(index);
+                setState(() {});
+              },
+              child: PlayerItem(
+                index: index,
             model: player,
             onIncrementLevel: () => setState(
               () => player.level < 10 ? player.level++ : player.level,
             ),
-            onDecrementLevel: () => setState(() => player.level--),
+                onDecrementLevel: () =>
+                    setState(() =>
+                    player.level != 1 ? player.level-- : player.level),
             onIncrementMight: () => setState(() => player.might++),
             onDecrementMight: () {
               setState(() {
@@ -103,14 +127,23 @@ class _MainScreenState extends State<MainScreen> {
                 }
               });
             },
+                onLongPress: (i, name) {
+                  _showAddPlayerSheet(
+                      context, renameMode: true, renameIndex: i, oldName: name);
+                },
+              )
           );
         },
       ),
     );
   }
 
-  void _showAddPlayerSheet(BuildContext context) {
-    final controller = TextEditingController();
+  void _showAddPlayerSheet(BuildContext context, {
+    bool renameMode = false,
+    int? renameIndex,
+    String? oldName,
+  }) {
+    final controller = TextEditingController(text: oldName);
 
     showModalBottomSheet(
       context: context,
@@ -135,8 +168,8 @@ class _MainScreenState extends State<MainScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  'Добавить игрока',
+                Text(
+                  !renameMode ? 'Добавить игрока' : 'Переименовать игрока',
                   style: TextStyle(
                     fontSize: 20,
                     color: darkGreen,
@@ -191,19 +224,40 @@ class _MainScreenState extends State<MainScreen> {
     ).then((result) {
       if (result != null && result is String) {
         // 👇 сюда приходит имя
+        if (renameMode && renameIndex != null) {
+          _rename(renameIndex, result);
+        } else {
         _addPlayer(result);
+        }
       }
     });
   }
 
+  void _resetDragonPool() {
+    _availableDragons.clear();
+    _availableDragons.addAll(List.generate(13, (index) => index + 1));
+    _availableDragons.shuffle();
+  }
+
+  void _rename(int index, String newName) async {
+    setState(() {
+      store.rename(index, newName);
+    });
+  }
+
   void _addPlayer(String name) {
+    if (_availableDragons.isEmpty) {
+      _resetDragonPool();
+    }
+    final dragonIndex = _availableDragons.removeLast();
+
     setState(() {
       store.players.add(
         MunchkinModel(
           name: name,
-          level: 0,
+          level: 1,
           might: 0,
-          image: "assets/images/dragon_${Random().nextInt(13) + 1}.png",
+          image: "assets/images/dragon_$dragonIndex.png",
         ),
       );
     });

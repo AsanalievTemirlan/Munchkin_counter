@@ -1,5 +1,5 @@
 class MunchkinModel {
-  final String name;
+  String name;
   int level;
   int might;
   final String image;
